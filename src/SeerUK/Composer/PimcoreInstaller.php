@@ -122,6 +122,34 @@ EOF;
     }
 
     /**
+     * Copy the Pimcore default .htaccess file to the 'document-root-path' if it does not exist
+     *
+     * @param Event $event
+     *
+     * @return void
+     */
+    public static function installHtAccessFile(Event $event)
+    {
+        list($installPath, $vendorPath) = self::prepareBaseDirectories($event);
+
+        $to = $installPath . "/.htaccess";
+
+        if (file_exists($to)) {
+            // .htaccess already exists, don't copy it
+            return;
+        }
+
+        if (file_exists($vendorPath . "/pimcore/pimcore/.htaccess")) {
+            $from = $vendorPath . "/pimcore/pimcore/.htaccess";
+        } else {
+            // unknown .htaccess file location within pimcore
+            return;
+        }
+
+        copy($from, $to);
+    }
+
+    /**
      * Prepare base directories for copying and installation
      *
      * @return array
